@@ -1115,6 +1115,20 @@
 </script>
 
 <script>
+/* ── localStorage bridge ── */
+(function(){
+  var _ls={
+    get:function(k){try{var v=localStorage.getItem(k);return v!==null?{key:k,value:v}:null;}catch(e){return null;}},
+    set:function(k,v){try{localStorage.setItem(k,String(v));return{key:k,value:v};}catch(e){return null;}},
+    del:function(k){try{localStorage.removeItem(k);return{key:k,deleted:true};}catch(e){return null;}}
+  };
+  window.storage={
+    get:function(k,s){return Promise.resolve(_ls.get(k));},
+    set:function(k,v,s){return Promise.resolve(_ls.set(k,v));},
+    delete:function(k,s){return Promise.resolve(_ls.del(k));},
+    list:function(p,s){try{var r=[];for(var i=0;i<localStorage.length;i++){var k2=localStorage.key(i);if(!p||k2.startsWith(p))r.push(k2);}return Promise.resolve({keys:r});}catch(e){return Promise.resolve({keys:[]});}}
+  };
+})();
 const isCaptureMode = new URLSearchParams(window.location.search).get('vista') === 'captura';
 
 const KEY_SNAPSHOT = 'inv_snapshot';
